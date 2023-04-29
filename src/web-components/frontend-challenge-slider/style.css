@@ -19,3 +19,8 @@ div.replace-me {
   background-color: #2975cf;
   color: white;
 }
+
+#image {
+  height: 100px;
+  width: auto;
+}

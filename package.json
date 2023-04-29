@@ -44,12 +44,12 @@
     "typescript-plugin-css-modules": "^2.8.0",
     "typings-for-css-modules-loader": "^1.7.0",
     "webpack": "^5.68.0",
-    "webpack-cli": "^4.9.2",
+    "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.7.4"
   },
   "dependencies": {
     "construct-style-sheets-polyfill": "^3.1.0",
-    "normalize.css": "^8.0.1",
-    "is-mobile": "^3.1.1"
+    "is-mobile": "^3.1.1",
+    "normalize.css": "^8.0.1"
   }
 }

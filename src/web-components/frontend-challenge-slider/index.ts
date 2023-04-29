@@ -2,6 +2,7 @@ import Style from "./style";
 import BrowserHelper from "../../helpers/browser-helper";
 import CustomElement from "../../core/custom-element";
 
+const baseCdnUrl = "https://ik.imagekit.io/brenor2/";
 export default class FrontendChallengeSlider extends CustomElement {
   //- TAG --------------------------------------------------------------------------------------------------------------
   public static readonly TAG: string = "frontend-challenge-slider";
@@ -23,12 +24,36 @@ export default class FrontendChallengeSlider extends CustomElement {
     this.applyAdoptedStyleSheets(Style);
 
     // TODO Add your implementation here
+    const template = `
+    <div class="container">
+    <div class="gallery">
+      <img
+        id="image"
+        alt="X6 M Competition"
+        tabindex="0"
+        class=""
+        src="https://ik.imagekit.io/brenor2/11.png"
+      />
+    </div>
+    <div><input id="slider" type="range" min="1" max="50" /></div>
+  </div>
+    `;
 
     // Append HTML content
     const replaceMe = document.createElement("div");
-    replaceMe.innerHTML = "CarCutter Frontend Challenge Slider";
+    replaceMe.innerHTML = template;
     replaceMe.classList.add("replace-me");
     this.appendToShadowRoot(replaceMe);
+
+    // add oninput event listener
+    const slider = this.shadowRoot?.querySelector("#slider");
+
+    slider?.addEventListener("input", (e) => {
+      const value = (e.target as HTMLInputElement).value;
+      // change image
+      const image = this.shadowRoot?.querySelector("#image") as HTMLInputElement;
+      image.src = `${baseCdnUrl}${value}.png`;
+    });
   }
 
   disconnectedCallback() {}
@@ -38,7 +63,7 @@ export default class FrontendChallengeSlider extends CustomElement {
   attributeChangedCallback(name: string, prev: string, value: string) {}
 
   static get observedAttributes() {
-    return [];
+    return ["cache-size", "show-thumbnails", "autoplay", "carousel"];
   }
 }
 
