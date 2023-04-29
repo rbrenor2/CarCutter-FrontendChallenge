@@ -13,6 +13,36 @@ export default class FrontendChallengeSlider extends CustomElement {
   //- Members ----------------------------------------------------------------------------------------------------------
   public isMobile = BrowserHelper.isBrowserMobile();
 
+  //- Attributes -------------------------------------------------------------------------------------------------------
+  get cacheSize(): number | undefined {
+    const cacheSize = Number(this.getAttribute("cache-size"));
+    return cacheSize ?? undefined;
+  }
+
+  get showTumbnails(): boolean {
+    return !!this.getAttribute("showTumbnails");
+  }
+
+  get autoplay(): boolean {
+    return !!this.getAttribute("autoplay");
+  }
+
+  get carousel(): boolean {
+    return !!this.getAttribute("carousel");
+  }
+
+  get media() {
+    // TODO get array with links from attr
+    const quantity = 35;
+    const links = [];
+
+    for (let index = 1; index <= quantity; index++) {
+      links.push(`${baseCdnUrl}${index}.png`);
+    }
+
+    return links;
+  }
+
   //- Constructor ------------------------------------------------------------------------------------------------------
   constructor() {
     super();
@@ -22,6 +52,10 @@ export default class FrontendChallengeSlider extends CustomElement {
   connectedCallback() {
     // Apply adopted style sheets found in 'style.module.css'
     this.applyAdoptedStyleSheets(Style);
+
+    document.onreadystatechange = () => {
+      this.readyStateListener();
+    };
 
     // TODO Add your implementation here
     const template = `
@@ -45,15 +79,9 @@ export default class FrontendChallengeSlider extends CustomElement {
     replaceMe.classList.add("replace-me");
     this.appendToShadowRoot(replaceMe);
 
+    //
     // add oninput event listener
-    const slider = this.shadowRoot?.querySelector("#slider");
-
-    slider?.addEventListener("input", (e) => {
-      const value = (e.target as HTMLInputElement).value;
-      // change image
-      const image = this.shadowRoot?.querySelector("#image") as HTMLInputElement;
-      image.src = `${baseCdnUrl}${value}.png`;
-    });
+    this.setupSliderListener();
   }
 
   disconnectedCallback() {}
@@ -63,7 +91,40 @@ export default class FrontendChallengeSlider extends CustomElement {
   attributeChangedCallback(name: string, prev: string, value: string) {}
 
   static get observedAttributes() {
-    return ["cache-size", "show-thumbnails", "autoplay", "carousel"];
+    return ["cache-size", "show-thumbnails", "autoplay", "carousel", "media"];
+  }
+
+  //- Listeners
+  setupSliderListener() {
+    const slider = this.shadowRoot?.querySelector("#slider");
+
+    slider?.addEventListener("input", (e) => {
+      const value = (e.target as HTMLInputElement).value;
+      const image = this.shadowRoot?.querySelector("#image") as HTMLInputElement;
+      image.src = `${baseCdnUrl}${value}.png`;
+    });
+  }
+
+  //- Preload media
+  preloadMedia(size?: number) {
+    for (let index = 0; index < (size ?? this.media.length); index++) {
+      const cachedImage = new Image();
+      cachedImage.addEventListener("load", () => {
+        console.log(`Cached image ${index}: ${this.media[index]}`);
+      });
+      cachedImage.src = this.media[index];
+    }
+  }
+
+  readyStateListener() {
+    switch (document.readyState) {
+      case "complete":
+        this.preloadMedia(this.cacheSize);
+        break;
+
+      default:
+        break;
+    }
   }
 }
 
