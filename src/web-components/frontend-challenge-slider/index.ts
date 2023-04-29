@@ -66,11 +66,11 @@ export default class FrontendChallengeSlider extends CustomElement {
         alt="X6 M Competition"
         tabindex="0"
         class=""
-        src="https://ik.imagekit.io/brenor2/11.png"
+        src="https://ik.imagekit.io/brenor2/1.png"
       />
     </div>
     <div><input id="slider" type="range" min="1" max="50" /></div>
-  </div>
+    </div>
     `;
 
     // Append HTML content
@@ -82,6 +82,10 @@ export default class FrontendChallengeSlider extends CustomElement {
     //
     // add oninput event listener
     this.setupSliderListener();
+
+    // setup first image
+    const imgGallery = this.shadowRoot?.querySelector("#image") as HTMLElement;
+    imgGallery.setAttribute("src", this.media[0]);
   }
 
   disconnectedCallback() {}
@@ -99,10 +103,15 @@ export default class FrontendChallengeSlider extends CustomElement {
     const slider = this.shadowRoot?.querySelector("#slider");
 
     slider?.addEventListener("input", (e) => {
-      const value = (e.target as HTMLInputElement).value;
-      const image = this.shadowRoot?.querySelector("#image") as HTMLInputElement;
-      image.src = `${baseCdnUrl}${value}.png`;
+      const value = Number((e.target as HTMLInputElement).value);
+      const url = this.media[value];
+      this.setImage(url);
     });
+  }
+
+  setImage(url: string) {
+    const image = this.shadowRoot?.querySelector("#image") as HTMLInputElement;
+    image.setAttribute("src", url);
   }
 
   //- Preload media
