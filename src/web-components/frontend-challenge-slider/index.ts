@@ -43,6 +43,17 @@ export default class FrontendChallengeSlider extends CustomElement {
     return links;
   }
 
+  isFullscreen = false;
+
+  // dragging
+  mousedown = false;
+  mousemove = false;
+  mouseup = false;
+
+  touchstart = false;
+  touchend = false;
+  touchmove = false;
+
   //- Constructor ------------------------------------------------------------------------------------------------------
   constructor() {
     super();
@@ -59,8 +70,8 @@ export default class FrontendChallengeSlider extends CustomElement {
 
     // TODO Add your implementation here
     const template = `
-    <div class="container">
-    <div class="gallery">
+    <div id="container">
+    <div id="gallery">
       <img
         id="image"
         alt="X6 M Competition"
@@ -69,6 +80,7 @@ export default class FrontendChallengeSlider extends CustomElement {
         src="https://ik.imagekit.io/brenor2/1.png"
       />
     </div>
+    <button class="btn" id="fullscreen-button"><i class="fas fa-expand"></i> fullscreen</button>
     <div><input id="slider" type="range" min="1" max="50" /></div>
     </div>
     `;
@@ -79,9 +91,10 @@ export default class FrontendChallengeSlider extends CustomElement {
     replaceMe.classList.add("replace-me");
     this.appendToShadowRoot(replaceMe);
 
-    //
-    // add oninput event listener
+    // adding listeners
     this.setupSliderListener();
+    this.setupFullscreenListener();
+    this.setupDragListeners();
 
     // setup first image
     const imgGallery = this.shadowRoot?.querySelector("#image") as HTMLElement;
@@ -134,6 +147,79 @@ export default class FrontendChallengeSlider extends CustomElement {
       default:
         break;
     }
+  }
+
+  setupFullscreenListener() {
+    const button = this.shadowRoot?.querySelector("#fullscreen-button");
+    const container = this.shadowRoot?.querySelector("#container");
+
+    button?.addEventListener("click", (e) => {
+      this.toggleFullscreen(container);
+    });
+  }
+
+  toggleFullscreen(elem: any) {
+    if (!this.isFullscreen) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        /* Safari */
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        /* IE11 */
+        elem.msRequestFullscreen();
+      }
+      this.isFullscreen = true;
+    } else {
+      document.exitFullscreen();
+      this.isFullscreen = false;
+    }
+  }
+
+  shouldChangeImage() {
+    if ((this.mousedown && this.mousemove) || (this.touchstart && this.touchmove)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // Dragger
+  setupDragListeners() {
+    const gallery = this.shadowRoot?.querySelector("#gallery");
+
+    gallery?.addEventListener("mousedown", (e) => {
+      console.log("mousedown");
+      this.mousedown = true;
+      // if(this.shouldChangeImage()) {
+      //   const url = this.media[value];
+      //   this.setImage(url);
+      // }
+    });
+    gallery?.addEventListener("touchstart", (e) => {
+      console.log("touchstart");
+      this.touchend = false;
+      this.touchstart = true;
+    });
+    gallery?.addEventListener("mousemove", (e) => {
+      this.mousemove = true;
+      console.log("mousemove");
+      console.log(e);
+    });
+    gallery?.addEventListener("touchmove", (e) => {
+      console.log("touchmove");
+      this.touchmove = true;
+    });
+    document.addEventListener("mouseup", (e) => {
+      console.log("mouseup");
+      this.mouseup = true;
+      this.mousedown = false;
+    });
+    gallery?.addEventListener("touchend", (e) => {
+      console.log("touchend");
+      this.touchend = true;
+      this.touchstart = false;
+    });
   }
 }
 
